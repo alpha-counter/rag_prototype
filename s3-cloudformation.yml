@@ -1,0 +1,90 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: CloudFormation template to create S3 bucket and two IAM users with specific permissions.
+
+Parameters:
+  Client:
+    Type: String
+    Description: Client identifier
+  Domain:
+    Type: String
+    Description: Domain name
+
+Resources:
+  DocumentsBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub documents.${Client}.${Domain}
+
+  ReadOnlyUser:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: !Sub ${Client}-read-only-user
+
+  FullAccessUser:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: !Sub ${Client}-full-access-user
+
+  ReadOnlyPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: !Sub ${Client}-ReadOnlyPolicy
+      Users:
+        - !Ref ReadOnlyUser
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - s3:GetObject
+              - s3:ListBucket
+            Resource:
+              - !Sub arn:aws:s3:::documents.${Client}.${Domain}
+              - !Sub arn:aws:s3:::documents.${Client}.${Domain}/*
+
+  FullAccessPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: !Sub ${Client}-FullAccessPolicy
+      Users:
+        - !Ref FullAccessUser
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - s3:*
+            Resource:
+              - !Sub arn:aws:s3:::documents.${Client}.${Domain}
+              - !Sub arn:aws:s3:::documents.${Client}.${Domain}/*
+
+  ReadOnlyAccessKeys:
+    Type: AWS::IAM::AccessKey
+    Properties:
+      UserName: !Ref ReadOnlyUser
+
+  FullAccessAccessKeys:
+    Type: AWS::IAM::AccessKey
+    Properties:
+      UserName: !Ref FullAccessUser
+
+Outputs:  
+  BucketName:
+    Description: Name of the S3 bucket
+    Value: !Ref DocumentsBucket
+  
+  ReadOnlyAccessKeyId:
+    Description: Access Key ID for the read-only user
+    Value: !Ref ReadOnlyAccessKeys
+
+  ReadOnlySecretAccessKey:
+    Description: Secret Access Key for the read-only user
+    Value: !GetAtt ReadOnlyAccessKeys.SecretAccessKey
+
+  FullAccessKeyId:
+    Description: Access Key ID for the full access user
+    Value: !Ref FullAccessAccessKeys
+
+  FullAccessSecretAccessKey:
+    Description: Secret Access Key for the full access user
+    Value: !GetAtt FullAccessAccessKeys.SecretAccessKey

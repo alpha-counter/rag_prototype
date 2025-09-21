@@ -1,0 +1,73 @@
+Zone 1 - Trial Management
+1.1 Trial Setup
+1.2 Trial Conduct
+1.3 Trial Close-Out
+1.4 Personnel
+1.5 Communication
+1.6 Meetings
+1.7 Training
+1.8 Trial Master File Management
+
+Zone 2 - Central Trial Documents
+2.1 Protocol and Amendments
+2.2 Investigator’s Brochure
+2.3 Sample Informed Consent Form
+2.4 Other Protocol Specific Documents
+
+Zone 3 - Regulatory
+3.1 Competent Authority
+3.2 Ethics Committee
+3.3 Inspections
+3.4 Notifications
+3.5 Essential Documents
+
+Zone 4 - Sites
+4.1 Site Identification
+4.2 Site Feasibility
+4.3 Site Selection
+4.4 Site Initiation
+4.5 Site Management
+4.6 Site Close-Out
+
+Zone 5 - Investigational Product
+5.1 Investigational Product Management
+5.2 Shipment
+5.3 Accountability
+5.4 Return and Destruction
+
+Zone 6 - Safety Reporting
+6.1 Safety Management Plan
+6.2 Adverse Events
+6.3 Serious Adverse Events (SAEs)
+6.4 SUSARs
+6.5 Safety Reporting to Authorities
+6.6 Other Safety Reporting
+
+Zone 7 - Trial Supplies
+7.1 Non-Product Trial Supplies
+7.2 Laboratory and Biological Samples
+7.3 Trial-Specific Supplies
+
+Zone 8 - Data Management
+8.1 Data Management Plan
+8.2 Case Report Forms (CRFs)
+8.3 Data Handling and Analysis
+8.4 Data Review
+8.5 Database Lock
+
+Zone 9 - Statistical
+9.1 Statistical Analysis Plan
+9.2 Interim Analysis
+9.3 Final Statistical Report
+9.4 Randomization and Blinding
+
+Zone 10 - Quality
+10.1 Monitoring
+10.2 Audits and Inspections
+10.3 Protocol Deviations
+10.4 Quality Management
+
+Zone 11 - Finance
+11.1 Budget
+11.2 Contracts
+11.3 Payments

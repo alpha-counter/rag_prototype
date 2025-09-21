@@ -1,0 +1,113 @@
+version: "3.8"
+
+services:
+
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: postgres
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "8080:80"
+    depends_on:
+      - postgres
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+
+  auth_service:
+    build:
+      context: ./auth_service
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql+psycopg2://admin:admin@postgres/db
+    depends_on:
+      - postgres
+    ports:
+      - "8000:8000"
+
+  resource_service:
+    build:
+      context: ./resource_service
+    env_file:
+      - .env
+    environment:
+      AUTH_SERVICE_URL: http://auth_service:8000
+    depends_on:
+      - auth_service
+    ports:
+      - "8006:8001"
+
+  documents_service:
+    build:
+      context: ./documents_service
+    env_file:
+      - .env
+    environment:
+      AUTH_SERVICE_URL: http://auth_service:8000
+    depends_on:
+      - auth_service
+    ports:
+      - "8002:8001"
+
+  index_service:
+    build:
+      context: ./index_service
+    env_file:
+      - .env
+    environment:
+      AUTH_SERVICE_URL: http://auth_service:8000
+      DATABASE_URL: postgresql+psycopg2://admin:admin@postgres/db
+      VECTORDB_URL: postgresql+psycopg2://admin:admin@postgres/vector
+    depends_on:
+      - auth_service
+      - postgres
+    ports:
+      - "8005:8001"
+
+  retrieval_service:
+    build:
+      context: ./retrieval_service
+    env_file:
+      - .env
+    environment:
+      AUTH_SERVICE_URL: http://auth_service:8000
+      VECTORDB_URL: postgresql+psycopg2://admin:admin@postgres/vector
+    depends_on:
+      - auth_service
+      - postgres
+    ports:
+      - "8003:8003"
+
+  chat_service:
+    build:
+      context: ./chat_service
+    env_file:
+      - .env
+    environment:
+      AUTH_SERVICE_URL: http://auth_service:8000
+      RETRIEVAL_SERVICE_URL: http://retrieval_service:8003
+    depends_on:
+      - auth_service
+      - retrieval_service
+    ports:
+      - "8004:8004"
+
+volumes:
+  postgres-data:
+  pgadmin-data:
+
+# docker-compose up --build
