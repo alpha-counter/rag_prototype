@@ -1,3 +1,5 @@
+import os
+
 from dotenv import load_dotenv
 from langgraph.graph import END, StateGraph
 
@@ -107,4 +109,6 @@ workflow.add_conditional_edges(
 
 graph = workflow.compile()
 
-graph.get_graph().draw_mermaid_png(output_file_path="graph.png")
+if os.getenv("CHAT_SERVICE_EXPORT_GRAPH", "false").lower() == "true":
+    output_path = os.getenv("CHAT_SERVICE_GRAPH_PATH", "graph.png")
+    graph.get_graph().draw_mermaid_png(output_file_path=output_path)

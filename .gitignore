@@ -87,3 +87,5 @@ pip-wheel-metadata/
 # OS-specific files
 Thumbs.db
 .DS_Store
+
+docs/*

@@ -11,7 +11,7 @@ import uvicorn
 
 load_dotenv()
 
-BRAND_NAME = os.getenv("BRAND_NAME", "aerasAI")
+BRAND_NAME = os.getenv("BRAND_NAME", "AI Platform")
 
 app = FastAPI(
     docs_url="/docs",

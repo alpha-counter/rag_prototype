@@ -1,6 +1,6 @@
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, DateTime
 from sqlalchemy.orm import relationship
-from datetime import datetime, timedelta
+from sqlalchemy.sql import func
 from auth_service.utils.dbUtil import Base
 
 class User(Base):
@@ -14,8 +14,8 @@ class User(Base):
     is_active = Column(Boolean, default=False)
     tfa_enabled = Column(Boolean, default=False)
     tfa_secret = Column(String)
-    created_on = Column(DateTime(timezone=False), default=datetime.now())
-    updated_on = Column(DateTime(timezone=False), default=datetime.now())
+    created_on = Column(DateTime(timezone=True), server_default=func.now())
+    updated_on = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
 class Blacklists(Base):
     __tablename__ = 'blacklists'
@@ -30,4 +30,4 @@ class Codes(Base):
     email = Column(String)
     reset_code = Column(String)
     status = Column(Boolean, default=True)
-    expired_in = Column(DateTime(timezone=False), default=datetime.now())
+    expired_in = Column(DateTime(timezone=True), server_default=func.now())

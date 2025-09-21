@@ -11,6 +11,36 @@ This prototype repository contains a multi-service FastAPI deployment that provi
 - **chat_service** – LangGraph workflow combining retrieval, grading, and optional web search, serving a streaming chat API/UI.
 - **resource_service** – Example protected API that demonstrates role-based guards.
 
+### Service Architecture
+
+```
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   Chat Service  │    │  Auth Service   │    │Documents Service│
+│   (Port 8004)   │    │   (Port 8000)   │    │   (Port 8002)   │
+│                 │    │                 │    │                 │
+│ • LangGraph     │    │ • JWT Auth      │    │ • S3 Integration│
+│ • Streaming UI  │    │ • User Mgmt     │    │ • TMF Structure │
+│ • Answer Grading│    │ • RBAC          │    │ • File Upload   │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+         │                       │                       │
+         └───────────────────────┼───────────────────────┘
+                                 │
+    ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+    │Retrieval Service│    │  Index Service  │    │Resource Service │
+    │   (Port 8003)   │    │   (Port 8005)   │    │   (Port 8006)   │
+    │                 │    │                 │    │                 │
+    │ • Vector Search │    │ • PDF Ingestion │    │ • Protected APIs│
+    │ • PGVector      │    │ • Chunking      │    │ • Example RBAC  │
+    │ • Embeddings    │    │ • Indexing      │    │ • Demo Endpoints│
+    └─────────────────┘    └─────────────────┘    └─────────────────┘
+                                 │
+                        ┌─────────────────┐
+                        │   PostgreSQL    │
+                        │   + PGVector    │
+                        │   (Port 5432)   │
+                        └─────────────────┘
+```
+
 ### Repository structure
 
 ```
@@ -128,6 +158,21 @@ The compose file provisions Postgres + pgAdmin, all FastAPI applications, and wi
 3. Retrieved documents are graded for relevance; irrelevant chunks trigger a web-search fallback.
 4. The generation chain produces a citation-rich answer, which is graded for hallucinations and alignment with the original question.
 5. Failing grades cause the workflow to retry (with web search if needed); successful answers stream back to the client.
+
+```mermaid
+graph TD
+    A[User Question] --> B{Route Question}
+    B -->|Clinical/RAG| C[Vector Retrieval]
+    B -->|General/Web| D[Web Search]
+    C --> E{Grade Documents}
+    E -->|Relevant| F[Generate Answer]
+    E -->|Irrelevant| D
+    D --> F
+    F --> G{Quality Check}
+    G -->|Hallucination| F
+    G -->|Off-topic| D
+    G -->|Good| H[Stream Response]
+```
 
 ## Tests
 

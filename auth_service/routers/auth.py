@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import text
 from fastapi.security import OAuth2PasswordRequestForm
 from datetime import datetime, timedelta, timezone
-import uuid
+import secrets
 from auth_service.utils import dbUtil,cryptoUtil,jwtUtil,emailUtil,otpUtil,constantUtil
 
 
@@ -81,7 +81,7 @@ def login_with_otp_for_access_token(request: schemas.LoginOTP , db: Session = De
         }
     }
 
-@router.post("/register")
+@router.post("/register", response_model=schemas.ShowUser)
 def register(request: schemas.CreateUser, db: Session = Depends(dbUtil.get_db)):
     ## Check if username/email exist in Database
     usr = db.query(models.User).filter(models.User.email == request.email).first()
@@ -91,7 +91,10 @@ def register(request: schemas.CreateUser, db: Session = Depends(dbUtil.get_db)):
                             detail=f"User already registered. !")
 
     # Create new user
-    return user.create(request, db)
+    created_user = user.create(request, db)
+    if hasattr(schemas.ShowUser, "model_validate"):
+        return schemas.ShowUser.model_validate(created_user)
+    return schemas.ShowUser.from_orm(created_user)
 
 @router.post("/auth/forgot-password")
 async def forgot_password(request: schemas.EmailRequest, db: Session = Depends(dbUtil.get_db)):
@@ -104,7 +107,7 @@ async def forgot_password(request: schemas.EmailRequest, db: Session = Depends(d
                             detail=f"User with email {request.email} doesn't exist !")
 
     # Create reset code and save it in database
-    reset_code = str(uuid.uuid1())
+    reset_code = secrets.token_urlsafe(32)
     auth.create_reset_code(request, reset_code, db)
 
     # Send email

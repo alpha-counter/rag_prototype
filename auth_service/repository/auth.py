@@ -3,7 +3,7 @@ from auth_service import models, schemas
 from sqlalchemy.orm import Session
 from sqlalchemy import text, and_, or_, not_
 from auth_service.utils import cryptoUtil
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 ## ---------------------------- Auth CRUD Operations-------------------------------
 ## To create new token for a password reset
@@ -17,7 +17,7 @@ def create_reset_code(request: schemas.EmailRequest, reset_code: str, db: Sessio
         'email': request.email,
         'reset_code': reset_code,
         'status': True,
-        'expired_in': datetime.now() + timedelta(hours=8)
+        'expired_in': datetime.now(timezone.utc) + timedelta(hours=8)
     })
     db.commit()
 
